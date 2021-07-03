@@ -1,3 +1,4 @@
+#script von https://www.youtube.com/watch?v=4fHL6BpJrC4&ab_channel=TechnikTests%26Reviews
 import time
 import RPi.GPIO as GPIO
 
