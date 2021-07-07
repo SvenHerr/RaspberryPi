@@ -14,6 +14,9 @@ def send(dateTimeArg,temperaturArg,tokenArg):
  PARAMS = {'DateTime':dateTime, 'Temperatur': temperatur}
   
 # sending get request and saving the response as response object
- r = requests.get(url = URL, params = PARAMS, token = TOKEN)
-  
- print(r)
+ try: 
+  r = requests.get(url = URL, params = PARAMS, token = TOKEN)
+  print(r)
+ except:
+  print("Error")
+print("Upload erfolgreich")
