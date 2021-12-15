@@ -5,6 +5,19 @@ import webservice
 
 data = {};
 value = {};
+
+def replacePoint(str):
+  temp = str.replace(',','.')
+  return temp
+
+def cast(str):
+  temp = str[:-1]
+  return float(temp)
+
+def castAndReplace(str):
+  temp = replacePoint(str)
+  return cast(temp)
+
 def getCPU():
   CPU_Pct=(round(float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),2))
   global data;
@@ -34,17 +47,11 @@ def getStorage():
   
   global data;
   data['STORAGE_TOTAL'] = str(storageTotal)
-  temp = storageTotal[:-1]
-  temp1 = temp.replace(',','.')
-  value['STORAGE_TOTAL'] = float(temp1) 
+  value['STORAGE_TOTAL'] = castAndReplace(storageTotal)
   data['STORAGE_FREE'] = str(storageFree)
-  temp = storageFree[:-1]
-  temp1 = temp.replace(',','.')
-  value['STORAGE_FREE'] = float(temp1)
+  value['STORAGE_FREE'] = castAndReplace(storageFree)
   data['STORAGE_USAGE'] = str(storageUsed)
-  temp = storageUsed[:-1]
-  temp1 = temp.replace(',', '.')
-  value['STORAGE_USAGE'] = float(temp1)  
+  value['STORAGE_USAGE'] = castAndReplace(storageUsed) 
 
 def getSys():
   runningTime = subprocess.check_output("cat /proc/uptime | awk '{print $1}'", shell=True).rstrip()
@@ -55,8 +62,7 @@ def getSys():
   value['RUNNING_TIME'] = round(display(runningTime)/60/60,2)
   data['TEMPERATURE'] = str(round(float(thermal)/1000,2)) +"C"
   temp = str(round(float(thermal)/1000,2))
-  temp1 = temp.replace(',','.')
-  value['TEMPERATURE'] = float(temp1)
+  value['TEMPERATURE'] = castAndReplace(temp)
 def isProgramRunning():
   Usage = subprocess.check_output("ps up `cat daemon.pid` >/dev/null && echo 'Running' || echo 'Not running'", shell=True)
   global data;
