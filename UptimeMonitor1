@@ -87,7 +87,7 @@ if __name__ == "__main__":
   print "CPU TEMP:\t" + data['TEMPERATURE'];
 
 try:
- webservice.send('token','Magic Mirror','','1',float(value['CPU_USAGE']),float(value['MEM_TOTAL']),float(value['MEM_USAGE']),float(value['MEM_FREE']),float(value['STORAGE_TOTAL']),float(value['STORAGE_USAGE']),float(value['STORAGE_FREE']),float(value['RUNNING_TIME']),float(value['TEMPERATURE']))
+ webservice.send('token','Magic Mirror','','1',value['CPU_USAGE'],value['MEM_TOTAL'],value['MEM_USAGE'],value['MEM_FREE'],value['STORAGE_TOTAL'],value['STORAGE_USAGE'],value['STORAGE_FREE'],value['RUNNING_TIME'],value['TEMPERATURE'])
  print(r)
 except:
   print("Error")
