@@ -5,7 +5,7 @@ import webservice
 
 data = {};
 value = {};
-debug = false;
+debug = "false";
 
 def replacePoint(str):
   temp = str.replace(',','.')
@@ -66,7 +66,7 @@ if __name__ == "__main__":
   getSys();
   #isProgramRunning();
 
-if debug == true
+if debug == "true":
   #print data
   print "CPU USAGE:\t" + str(data['CPU_USAGE']) + "%";
   print "MEMORY TOTAL:\t" + str(data['MEM_TOTAL']) + "GB";
@@ -80,7 +80,7 @@ if debug == true
 
 try:
  webservice.send('123','Magic Mirror','','1',value['CPU_USAGE'],value['MEM_TOTAL'],value['MEM_USAGE'],value['MEM_FREE'],value['STORAGE_TOTAL'],value['STORAGE_USAGE'],value['STORAGE_FREE'],value['RUNNING_TIME'],value['TEMPERATURE'])
- print(r)
+ #print(r)
 except:
   print("Error")
 print("Script erfolgreich")
