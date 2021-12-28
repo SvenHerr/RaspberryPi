@@ -35,3 +35,25 @@ Download:
 ```sudo python3 GetPinOutput.py```
 <br>
 <br>
+
+
+
+## CallWebservice.py<br>
+Example of how to call an webservice with python<br>
+Download:
+``` wget https://github.com/SvenHerr/RaspberryPi/blob/master/CallWebservice.py```
+<br>to run it use:
+```sudo python3 CallWebservice.py```
+<br>
+<br>
+
+
+
+## CheckTemp.py<br>
+Shows Temperatur<br>
+Download:
+``` wget https://github.com/SvenHerr/RaspberryPi/blob/master/CheckTemp.py```
+<br>to run it use:
+```sudo python3 CheckTemp.py```
+<br>
+<br>
