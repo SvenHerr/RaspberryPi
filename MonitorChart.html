@@ -7,6 +7,7 @@
 
             var myJson = "";
             var myJsonTest = [];
+            var totalCount = 0;
             var count = 0;
             const userAction = async() => {
                 const response = await fetch('https://api.herrmannsven.de/pimonitor/getall/?token=123');
@@ -15,73 +16,35 @@
 
                 myJson.forEach(element => {
 
-                    if (element.cpuTemperature != 0 & element.cpuTemperature != 123) {
-                        myJsonTest.push({
-                            x: count,
-                            y: element.cpuTemperature
-                        });
+                    if(element.createDate.includes("2021-12-15T")){
+                        if (element.cpuTemperature != 0 & element.cpuTemperature != 123) {
+                                myJsonTest.push({
+                                    x: count,
+                                    y: element.cpuTemperature
+                                });
+
+                                count +=1;
+                        }
                     }
-
-
-                    //console.log("Temp:" + element.cpuTemperature);
-                    count += 1;
+                    
+                    totalCount += 1;
                 });
 
+                console.log("found: " + myJsonTest.length + " data. From: " + totalCount);
+
                 doChartStuff();
-
-                //cpuTemperature
             };
-            /*
-                        myJsonTest.push({
-                            x: 5,
-                            y: 40
-                        });
-                        myJsonTest.push({
-                            x: 6,
-                            y: 45
-                        });
-                        myJsonTest.push({
-                            x: 7,
-                            y: 50
-                        });
-                        myJsonTest.push({
-                            x: 8,
-                            y: 55
-                        });*/
-
 
             function doChartStuff() {
                 var chart = new CanvasJS.Chart("chartContainer", {
                     animationEnabled: true,
                     theme: "light2",
                     title: {
-                        text: "Simple Line Chart"
+                        text: "Magic Mirror Temeratur"
                     },
                     data: [{
                         type: "line",
                         indexLabelFontSize: 16,
-                        /*dataPoints: [{
-                                x: 5,
-                                y: 40
-                            }, {
-                                x: 10,
-                                y: 45
-                            }, {
-                                x: 15,
-                                y: 50
-                            }, {
-                                x: 20,
-                                y: 55
-                            }, {
-                                x: 25,
-                                y: 60
-                            }, {
-                                x: 30,
-                                y: 65
-                            }, {
-                                x: 35,
-                                y: 70
-                            }]*/
                         dataPoints: myJsonTest
                     }]
 
@@ -96,7 +59,7 @@
 </head>
 
 <body>
-    <div id="chartContainer" style="height: 300px; width: 10000px;"></div>
+    <div id="chartContainer" style="height: 300px; width: 100%;"></div>
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </body>
 
