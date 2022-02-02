@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <script>
+        window.onload = function() {
+
+            var myJson = "";
+            var myJsonTest = [];
+            var count = 0;
+            const userAction = async() => {
+                const response = await fetch('https://api.herrmannsven.de/pimonitor/getall/?token=123');
+                myJson = await response.json(); //extract JSON from the http response
+                // do something with myJson
+
+                myJson.forEach(element => {
+
+                    if (element.cpuTemperature != 0 & element.cpuTemperature != 123) {
+                        myJsonTest.push({
+                            x: count,
+                            y: element.cpuTemperature
+                        });
+                    }
+
+
+                    //console.log("Temp:" + element.cpuTemperature);
+                    count += 1;
+                });
+
+                doChartStuff();
+
+                //cpuTemperature
+            };
+            /*
+                        myJsonTest.push({
+                            x: 5,
+                            y: 40
+                        });
+                        myJsonTest.push({
+                            x: 6,
+                            y: 45
+                        });
+                        myJsonTest.push({
+                            x: 7,
+                            y: 50
+                        });
+                        myJsonTest.push({
+                            x: 8,
+                            y: 55
+                        });*/
+
+
+            function doChartStuff() {
+                var chart = new CanvasJS.Chart("chartContainer", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    title: {
+                        text: "Simple Line Chart"
+                    },
+                    data: [{
+                        type: "line",
+                        indexLabelFontSize: 16,
+                        /*dataPoints: [{
+                                x: 5,
+                                y: 40
+                            }, {
+                                x: 10,
+                                y: 45
+                            }, {
+                                x: 15,
+                                y: 50
+                            }, {
+                                x: 20,
+                                y: 55
+                            }, {
+                                x: 25,
+                                y: 60
+                            }, {
+                                x: 30,
+                                y: 65
+                            }, {
+                                x: 35,
+                                y: 70
+                            }]*/
+                        dataPoints: myJsonTest
+                    }]
+
+                });
+
+                chart.render();
+            }
+            userAction()
+
+        }
+    </script>
+</head>
+
+<body>
+    <div id="chartContainer" style="height: 300px; width: 10000px;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+
+</html>
