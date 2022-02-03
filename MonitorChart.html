@@ -7,34 +7,51 @@
         var myJsonTest = [];
         var totalCount = 0;
         var count = 0;
+        var counter = 2;
 
         var date = new Date();
-
         var dd = String(date.getDate()).padStart(2, '0');
         var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
         var yyyy = date.getFullYear();
-
         var currentDate = yyyy + "-" + mm + "-" + dd;
+
+        const userAction = async() => {
+            const response = await fetch('https://api.herrmannsven.de/pimonitor/getall/?token=123');
+            myJson = await response.json(); //extract JSON from the http response
+            // do something with myJson
+            console.log("vor if" + currentDate);
+        };
+
+        function setCurrentDateString() {
+            dd = String(date.getDate()).padStart(2, '0');
+            mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+            yyyy = date.getFullYear();
+            currentDate = yyyy + "-" + mm + "-" + dd;
+        }
 
         function setPreviousDay() {
             date.setDate(date.getDate() - 1);
-
+            setCurrentDateString();
             setArray();
         }
 
         function setNextDay() {
             date.setDate(date.getDate() + 1);
-
+            setCurrentDateString();
             setArray();
         };
 
-        function setArray() {
-            dd = String(date.getDate()).padStart(2, '0');
-            mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
-            yyyy = date.getFullYear();
+        function resetDate() {
+            date = new Date();
+            setCurrentDateString();
+            date = new Date(currentDate);
+            setArray();
+            console.log(date);
+        };
 
-            currentDate = yyyy + "-" + mm + "-" + dd;
+        function setArray() {
             console.log("CurrentDate: " + currentDate);
+            setLabelDate();
 
             myJsonTest = [];
             myJson.forEach(element => {
@@ -53,27 +70,20 @@
             console.log("found: " + myJsonTest.length + " data. From: " + totalCount);
 
             doChartStuff();
+
         }
 
-        function resetDate() {
-
-            date = new Date(currentDate);
-            console.log(date);
-        };
-
-        const userAction = async() => {
-            const response = await fetch('https://api.herrmannsven.de/pimonitor/getall/?token=123');
-            myJson = await response.json(); //extract JSON from the http response
-            // do something with myJson
-            console.log("vor if" + currentDate);
-        };
+        function setLabelDate() {
+            var label = document.getElementById("labelDate");
+            label.innerHTML = currentDate;
+        }
 
         function doChartStuff() {
             var chart = new CanvasJS.Chart("chartContainer", {
                 animationEnabled: true,
                 theme: "light2",
                 title: {
-                    text: "Magic Mirror Temeratur"
+                    text: "Magic Mirror Temperatur"
                 },
                 data: [{
                     type: "line",
@@ -84,15 +94,95 @@
             chart.render();
         }
 
-        userAction();
+
+        async function init() {
+            await userAction();
+            setArray();
+            setLabelDate();
+            doChartStuff();
+        }
+
+        function callTime() {
+
+            var i = 1; //  set your counter to 1
+
+            function myLoop() { //  create a loop function
+                setTimeout(function() { //  call a 3s setTimeout when the loop is called
+
+                    document.getElementById("waitlabel").innerHTML = "( " + counter + " )"
+                    counter -= 1;
+                    i++; //  increment the counter
+                    if (i < 5) { //  if the counter < 10, call the loop function
+                        myLoop(); //  ..  again which will trigger another 
+                    } //  ..  setTimeout()
+                }, 1000)
+            }
+
+            myLoop();
+        }
+
+        function hideWaitLabel() {
+            document.getElementById("waitLabelContainer").style.display = 'none';
+        }
+
+        window.onload = async function() {
+
+            callTime();
+            await init();
+            hideWaitLabel();
+        }
     </script>
+    <style>
+        .container {
+            margin-top: 50px;
+            justify-content: center;
+            display: flex;
+        }
+        
+        .center {
+            vertical-align: middle;
+            text-align: center;
+        }
+        
+        .margin {
+            margin: 25px;
+        }
+        
+        .marginSmall {
+            margin: 15px;
+        }
+        
+        .padding {
+            padding: 10px;
+        }
+        
+        .waitStyle {
+            color: brown;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="chartContainer" style="height: 300px; width: 100%;"></div>
-    <button onclick="setNextDay()">Next</button>
-    <button onclick="resetDate()">Reset</button>
-    <button onclick="setPreviousDay()">Previous</button>
+
+    <div id="chartContainer" style="height: 300px; width: 95%;" class="padding"></div>
+    <div class="center" id="waitLabelContainer">
+        <h2 class="waitStyle">Please wait <label id="waitlabel">( 3 )</label></h2>
+    </div>
+
+    <div class="container margin">
+        <div>
+            <div class="center margin">
+                <label id="labelDate">Date</label>
+            </div>
+            <div>
+                <button class="marginSmall" onclick="setPreviousDay()">Previous</button>
+                <button class="marginSmall" onclick="resetDate()">Reset</button>
+                <button class="marginSmall" onclick="setNextDay()">Next</button>
+            </div>
+        </div>
+
+    </div>
+
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </body>
 
