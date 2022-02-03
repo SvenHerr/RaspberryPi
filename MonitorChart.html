@@ -3,63 +3,96 @@
 
 <head>
     <script>
-        window.onload = function() {
+        var myJson = "";
+        var myJsonTest = [];
+        var totalCount = 0;
+        var count = 0;
 
-            var myJson = "";
-            var myJsonTest = [];
-            var totalCount = 0;
-            var count = 0;
-            const userAction = async() => {
-                const response = await fetch('https://api.herrmannsven.de/pimonitor/getall/?token=123');
-                myJson = await response.json(); //extract JSON from the http response
-                // do something with myJson
+        var date = new Date();
 
-                myJson.forEach(element => {
+        var dd = String(date.getDate()).padStart(2, '0');
+        var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = date.getFullYear();
 
-                    if(element.createDate.includes("2021-12-15T")){
-                        if (element.cpuTemperature != 0 & element.cpuTemperature != 123) {
-                                myJsonTest.push({
-                                    x: count,
-                                    y: element.cpuTemperature
-                                });
+        var currentDate = yyyy + "-" + mm + "-" + dd;
 
-                                count +=1;
-                        }
-                    }
-                    
-                    totalCount += 1;
-                });
+        function setPreviousDay() {
+            date.setDate(date.getDate() - 1);
 
-                console.log("found: " + myJsonTest.length + " data. From: " + totalCount);
-
-                doChartStuff();
-            };
-
-            function doChartStuff() {
-                var chart = new CanvasJS.Chart("chartContainer", {
-                    animationEnabled: true,
-                    theme: "light2",
-                    title: {
-                        text: "Magic Mirror Temeratur"
-                    },
-                    data: [{
-                        type: "line",
-                        indexLabelFontSize: 16,
-                        dataPoints: myJsonTest
-                    }]
-
-                });
-
-                chart.render();
-            }
-            userAction()
-
+            setArray();
         }
+
+        function setNextDay() {
+            date.setDate(date.getDate() + 1);
+
+            setArray();
+        };
+
+        function setArray() {
+            dd = String(date.getDate()).padStart(2, '0');
+            mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+            yyyy = date.getFullYear();
+
+            currentDate = yyyy + "-" + mm + "-" + dd;
+            console.log("CurrentDate: " + currentDate);
+
+            myJsonTest = [];
+            myJson.forEach(element => {
+                if (element.createDate.includes(currentDate)) {
+                    console.log(element.createDate);
+                    if (element.cpuTemperature != 0 & element.cpuTemperature != 123) {
+                        myJsonTest.push({
+                            x: count,
+                            y: element.cpuTemperature
+                        });
+                        count += 1;
+                    }
+                }
+                totalCount += 1;
+            });
+            console.log("found: " + myJsonTest.length + " data. From: " + totalCount);
+
+            doChartStuff();
+        }
+
+        function resetDate() {
+
+            date = new Date(currentDate);
+            console.log(date);
+        };
+
+        const userAction = async() => {
+            const response = await fetch('https://api.herrmannsven.de/pimonitor/getall/?token=123');
+            myJson = await response.json(); //extract JSON from the http response
+            // do something with myJson
+            console.log("vor if" + currentDate);
+        };
+
+        function doChartStuff() {
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Magic Mirror Temeratur"
+                },
+                data: [{
+                    type: "line",
+                    indexLabelFontSize: 16,
+                    dataPoints: myJsonTest
+                }]
+            });
+            chart.render();
+        }
+
+        userAction();
     </script>
 </head>
 
 <body>
     <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+    <button onclick="setNextDay()">Next</button>
+    <button onclick="resetDate()">Reset</button>
+    <button onclick="setPreviousDay()">Previous</button>
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </body>
 
