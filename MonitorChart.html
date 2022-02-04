@@ -71,6 +71,7 @@
 
             doChartStuff();
 
+            calculateAverage();
         }
 
         function setLabelDate() {
@@ -94,6 +95,18 @@
             chart.render();
         }
 
+        function calculateAverage() {
+
+            var sum = 0;
+            for (var i = 0; i < myJsonTest.length; i++) {
+                sum += parseInt(myJsonTest[i].y, 10); //don't forget to add the base
+            }
+
+            var avg = sum / myJsonTest.length;
+
+            document.getElementById("averageTemp").innerHTML = (Math.round(avg * 100) / 100) + "°C";
+            console.log(avg);
+        }
 
         async function init() {
             await userAction();
@@ -104,20 +117,19 @@
 
         function callTime() {
 
-            var i = 1; //  set your counter to 1
+            var i = 1;
 
-            function myLoop() { //  create a loop function
-                setTimeout(function() { //  call a 3s setTimeout when the loop is called
+            function myLoop() {
+                setTimeout(function() {
 
                     document.getElementById("waitlabel").innerHTML = "( " + counter + " )"
                     counter -= 1;
-                    i++; //  increment the counter
-                    if (i < 5) { //  if the counter < 10, call the loop function
-                        myLoop(); //  ..  again which will trigger another 
-                    } //  ..  setTimeout()
+                    i++;
+                    if (i < 5) {
+                        myLoop();
+                    }
                 }, 1000)
             }
-
             myLoop();
         }
 
@@ -172,7 +184,13 @@
     <div class="container margin">
         <div>
             <div class="center margin">
-                <label id="labelDate">Date</label>
+                <div class="padding">
+                    <label>Avg. Temp:</label>
+                    <label id="averageTemp">XX.XX°C</label>
+                </div>
+                <div>
+                    <label id="labelDate">Date</label>
+                </div>
             </div>
             <div>
                 <button class="marginSmall" onclick="setPreviousDay()">Previous</button>
