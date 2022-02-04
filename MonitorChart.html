@@ -16,10 +16,17 @@
         var currentDate = yyyy + "-" + mm + "-" + dd;
 
         const userAction = async() => {
+            // This is my public api. Please be aware that this is all client side. If you have an pw then be careful
             const response = await fetch('https://api.herrmannsven.de/pimonitor/getall/?token=123');
             myJson = await response.json(); //extract JSON from the http response
+
+            // Filter is on piId because my magic mirror has piId 1
+            myJson = myJson.filter(function(x) {
+                return x.piId == 1;
+            });
+
             // do something with myJson
-            console.log("vor if" + currentDate);
+            console.log("Date: " + currentDate);
         };
 
         function setCurrentDateString() {
@@ -35,7 +42,24 @@
             setArray();
         }
 
+        function isNextButtonAllowed() {
+            var dateTemp = new Date();
+            dateTempdd = String(dateTemp.getDate()).padStart(2, '0');
+            dateTempmm = String(dateTemp.getMonth() + 1).padStart(2, '0'); //January is 0!
+            dateTempyyyy = dateTemp.getFullYear();
+            today = dateTempyyyy + "-" + dateTempmm + "-" + dateTempdd;
+
+            if (currentDate == today) {
+                return false;
+            }
+
+            return true;
+        }
+
         function setNextDay() {
+            if (isNextButtonAllowed() == false) {
+                return;
+            }
             date.setDate(date.getDate() + 1);
             setCurrentDateString();
             setArray();
@@ -55,6 +79,7 @@
 
             myJsonTest = [];
             myJson.forEach(element => {
+
                 if (element.createDate.includes(currentDate)) {
                     console.log(element.createDate);
                     if (element.cpuTemperature != 0 & element.cpuTemperature != 123) {
