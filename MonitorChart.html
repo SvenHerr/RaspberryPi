@@ -97,6 +97,8 @@
             doChartStuff();
 
             calculateAverage();
+            setHighestTemperatur();
+            setLowestTemperatur();
         }
 
         function setLabelDate() {
@@ -131,6 +133,28 @@
 
             document.getElementById("averageTemp").innerHTML = (Math.round(avg * 100) / 100) + "°C";
             console.log(avg);
+        }
+
+        function setHighestTemperatur() {
+
+                var temphighestTemperatur = 0;
+                myJsonTest.forEach(element =>{
+                if(temphighestTemperatur < element.y)
+                    temphighestTemperatur = element.y
+                });
+                document.getElementById("highestTemp").innerHTML = temphighestTemperatur + "°C";
+                console.log(temphighestTemperatur);
+        }
+
+        function setLowestTemperatur() {
+
+            var tempLowestTemperatur = myJsonTest[0].y;
+                myJsonTest.forEach(element =>{
+                if(tempLowestTemperatur > element.y)
+                    tempLowestTemperatur = element.y
+                });
+                document.getElementById("lowestTemp").innerHTML = tempLowestTemperatur + "°C";
+                console.log(tempLowestTemperatur);
         }
 
         async function init() {
@@ -212,6 +236,14 @@
                 <div class="padding">
                     <label>Avg. Temp:</label>
                     <label id="averageTemp">XX.XX°C</label>
+                </div>
+                <div class="padding">
+                    <label>Highest Temp:</label>
+                    <label id="highestTemp">XX.XX°C</label>
+                </div>
+                <div class="padding">
+                    <label>Lowest Temp:</label>
+                    <label id="lowestTemp">XX.XX°C</label>
                 </div>
                 <div>
                     <label id="labelDate">Date</label>
