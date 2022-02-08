@@ -15,10 +15,11 @@ $response_data = json_decode($json_data);
 <head>
     <script>
         var myJson = "";
-        var myJsonTest = [];
+        var responseDayArray = [];
         var totalCount = 0;
         var count = 0;
         var counter = 2;
+        var responseArray = [];
 
         var date = new Date();
         var dd = String(date.getDate()).padStart(2, '0');
@@ -26,16 +27,12 @@ $response_data = json_decode($json_data);
         var yyyy = date.getFullYear();
         var currentDate = yyyy + "-" + mm + "-" + dd;
 
-        function userAction() {
+        function getApiResponse() {
             
-            myJson =  <?php echo json_encode($response_data );?>;
-            
+            myJson =  <?php echo json_encode($response_data );?>;      
             myJson = myJson.filter(function(x) {
                 return x.piId == 1;
             });
-           
-            // do something with myJson
-            console.log("vor if" + currentDate);
         };
 
         function setCurrentDateString() {
@@ -79,20 +76,30 @@ $response_data = json_decode($json_data);
             setCurrentDateString();
             date = new Date(currentDate);
             setArray();
-            console.log(date);
         };
 
+        function alltimeHelper(){
+            responseArray = [];
+            myJson.forEach(element => {
+                    if (element.cpuTemperature != 0 & element.cpuTemperature != 123) {
+                        responseArray.push({
+                            x: count,
+                            y: element.cpuTemperature
+                        });
+                        count += 1;
+                    }
+            });
+        }
+
         function setArray() {
-            console.log("CurrentDate: " + currentDate);
+            
             setLabelDate();
 
-            myJsonTest = [];
+            responseDayArray = [];
             myJson.forEach(element => {
-
                 if (element.createDate.includes(currentDate)) {
-                    console.log(element.createDate);
                     if (element.cpuTemperature != 0 & element.cpuTemperature != 123) {
-                        myJsonTest.push({
+                        responseDayArray.push({
                             x: count,
                             y: element.cpuTemperature
                         });
@@ -101,10 +108,9 @@ $response_data = json_decode($json_data);
                 }
                 totalCount += 1;
             });
-            console.log("found: " + myJsonTest.length + " data. From: " + totalCount);
+            console.log("found: " + responseDayArray.length + " data. From: " + totalCount);
 
             doChartStuff();
-
             calculateAverage();
             setHighestTemperatur();
             setLowestTemperatur();
@@ -125,7 +131,7 @@ $response_data = json_decode($json_data);
                 data: [{
                     type: "line",
                     indexLabelFontSize: 16,
-                    dataPoints: myJsonTest
+                    dataPoints: responseDayArray
                 }]
             });
             chart.render();
@@ -134,41 +140,72 @@ $response_data = json_decode($json_data);
         function calculateAverage() {
 
             var sum = 0;
-            for (var i = 0; i < myJsonTest.length; i++) {
-                sum += parseInt(myJsonTest[i].y, 10); //don't forget to add the base
+            for (var i = 0; i < responseDayArray.length; i++) {
+                sum += parseInt(responseDayArray[i].y, 10); //don't forget to add the base
             }
 
-            var avg = sum / myJsonTest.length;
-
+            var avg = sum / responseDayArray.length;
             document.getElementById("averageTemp").innerHTML = (Math.round(avg * 100) / 100) + "°C";
-            console.log(avg);
+        }
+
+        function calculateAlltimeAverage() {
+
+            var sum = 0;
+            for (var i = 0; i < responseArray.length; i++) {
+                sum += parseInt(responseArray[i].y, 10); //don't forget to add the base
+            }
+
+            var avg = sum / responseArray.length;
+            document.getElementById("alltimeAverageTemp").innerHTML = (Math.round(avg * 100) / 100) + "°C";
         }
 
         function setHighestTemperatur() {
 
-                var temphighestTemperatur = 0;
-                myJsonTest.forEach(element =>{
+            var temphighestTemperatur = 0;
+            responseDayArray.forEach(element =>{
                 if(temphighestTemperatur < element.y)
                     temphighestTemperatur = element.y
                 });
-                document.getElementById("highestTemp").innerHTML = temphighestTemperatur + "°C";
-                console.log(temphighestTemperatur);
+            document.getElementById("highestTemp").innerHTML = temphighestTemperatur + "°C";
         }
 
         function setLowestTemperatur() {
 
-            var tempLowestTemperatur = myJsonTest[0].y;
-                myJsonTest.forEach(element =>{
+            var tempLowestTemperatur = responseDayArray[0].y;
+            responseDayArray.forEach(element =>{
                 if(tempLowestTemperatur > element.y)
                     tempLowestTemperatur = element.y
                 });
-                document.getElementById("lowestTemp").innerHTML = tempLowestTemperatur + "°C";
-                console.log(tempLowestTemperatur);
+            document.getElementById("lowestTemp").innerHTML = tempLowestTemperatur + "°C";
         }
 
-        async function init() {
-            await userAction();
+        function setAlltimeLowTemperatur() {
+
+            var tempLowestTemperatur = responseArray[0].y;
+            responseArray.forEach(element =>{
+                if(tempLowestTemperatur > element.y)
+                    tempLowestTemperatur = element.y
+                });
+            document.getElementById("alltimeLowTemp").innerHTML = tempLowestTemperatur + "°C";
+        }
+
+        function setAlltimeHighTemperatur() {
+
+            var temphighestTemperatur = 0;
+            responseArray.forEach(element =>{
+            if(temphighestTemperatur < element.y)
+                temphighestTemperatur = element.y
+            });
+            document.getElementById("alltimeHighTemp").innerHTML = temphighestTemperatur + "°C";
+        }
+
+        function init() {
+            getApiResponse();
+            alltimeHelper();
             setArray();
+            setAlltimeHighTemperatur();
+            setAlltimeLowTemperatur();
+            calculateAlltimeAverage();
             setLabelDate();
             doChartStuff();
         }
@@ -179,7 +216,6 @@ $response_data = json_decode($json_data);
 
             function myLoop() {
                 setTimeout(function() {
-
                     document.getElementById("waitlabel").innerHTML = "( " + counter + " )"
                     counter -= 1;
                     i++;
@@ -196,7 +232,6 @@ $response_data = json_decode($json_data);
         }
 
         window.onload = async function() {
-
             callTime();
             await init();
             hideWaitLabel();
@@ -207,6 +242,11 @@ $response_data = json_decode($json_data);
             margin-top: 50px;
             justify-content: center;
             display: flex;
+        }
+
+        .chartContainer{
+            height: 300px; 
+            width: 95%;
         }
         
         .center {
@@ -229,36 +269,59 @@ $response_data = json_decode($json_data);
         .waitStyle {
             color: brown;
         }
+
+        .displayFlex{
+            display: flex;
+        }
     </style>
 </head>
 
 <body>
 
-    <div id="chartContainer" style="height: 300px; width: 95%;" class="padding"></div>
+    <div id="chartContainer" class="chartContainer padding"></div>
     <div class="center" id="waitLabelContainer">
         <h2 class="waitStyle">Please wait <label id="waitlabel">( 3 )</label></h2>
     </div>
 
     <div class="container margin">
         <div>
-            <div class="center margin">
-                <div class="padding">
-                    <label>Avg. Temp:</label>
-                    <label id="averageTemp">XX.XX°C</label>
+            <div class="displayFlex">
+                <div class="center margin">
+                    <div class="padding">
+                        <label>Avg. Temp:</label>
+                        <label id="averageTemp">XX.XX°C</label>
+                    </div>
+                    <div class="padding">
+                        <label>Highest Temp:</label>
+                        <label id="highestTemp">XX.XX°C</label>
+                    </div>
+                    <div class="padding">
+                        <label>Lowest Temp:</label>
+                        <label id="lowestTemp">XX.XX°C</label>
+                    </div>
+                   
                 </div>
-                <div class="padding">
-                    <label>Highest Temp:</label>
-                    <label id="highestTemp">XX.XX°C</label>
-                </div>
-                <div class="padding">
-                    <label>Lowest Temp:</label>
-                    <label id="lowestTemp">XX.XX°C</label>
-                </div>
-                <div>
-                    <label id="labelDate">Date</label>
+                <div class="center margin">
+                    <div class="padding">
+                        <label>Avg. Temp:</label>
+                        <label id="alltimeAverageTemp">XX.XX°C</label>
+                    </div>
+                    <div class="padding">
+                        <label>Highest Temp:</label>
+                        <label id="alltimeHighTemp">XX.XX°C</label>
+                    </div>
+                    <div class="padding">
+                        <label>Lowest Temp:</label>
+                        <label id="alltimeLowTemp">XX.XX°C</label>
+                    </div>
                 </div>
             </div>
-            <div>
+
+            <div  class="center">
+                <label id="labelDate">Date</label>
+            </div>
+            
+            <div class="center margin">
                 <button class="marginSmall" onclick="setPreviousDay()">Previous</button>
                 <button class="marginSmall" onclick="resetDate()">Reset</button>
                 <button class="marginSmall" onclick="setNextDay()">Next</button>
